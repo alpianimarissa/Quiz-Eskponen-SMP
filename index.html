@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif 30 Soal Eksponen & Akar - Kelas 7 SMP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for rendering mathematical formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        smp: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .katex-display {
+            margin: 0.3em 0 !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 2px 0;
+        }
+        /* Custom scrollbar for question grid in light mode */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-smp-500 selection:text-white bg-slate-100 text-slate-800">
+
+    <!-- Top Header & Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-smp-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-smp-500/20">
+                        30
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-extrabold text-base sm:text-lg text-slate-900">Kuis Eksponen & Akar</h1>
+                            <span class="text-[10px] bg-smp-50 text-smp-700 font-bold px-2 py-0.5 rounded-full border border-smp-200">30 Soal Kelas 7</span>
+                        </div>
+                        <span class="text-[11px] block text-slate-500 font-medium">Uji Pemahaman Terstruktur dengan Pembahasan Instant</span>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button id="reset-storage-btn" title="Reset Semua Jawaban" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 hover:border-rose-300 text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Reset Kuis</span>
+                    </button>
+                    <button id="show-summary-btn" class="bg-smp-600 hover:bg-smp-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-smp-600/20">
+                        <i class="fa-solid fa-chart-pie"></i> <span>Hasil Akhir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Sidebar: Question Navigation Grid (4 cols on lg) -->
+        <aside class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col justify-between h-fit lg:sticky lg:top-20">
+            <div>
+                <!-- Header Stats -->
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Kemajuan Kuis</span>
+                        <span id="answered-count-label" class="text-lg font-extrabold text-amber-600">0 / 30 Terjawab</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-500 font-medium block">Skor Sementara</span>
+                        <span id="score-label" class="text-lg font-extrabold text-emerald-600">0 Poin</span>
+                    </div>
+                </div>
+
+                <!-- Status Legend -->
+                <div class="flex items-center justify-between text-[11px] text-slate-500 mb-3 px-1">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span> Belum</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Benar</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Salah</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full border-2 border-smp-500 bg-smp-100"></span> Aktif</span>
+                </div>
+
+                <!-- Question Number Palette (1-30) -->
+                <div id="question-palette" class="grid grid-cols-6 sm:grid-cols-10 lg:grid-cols-6 gap-2 max-h-64 sm:max-h-none overflow-y-auto custom-scrollbar p-1">
+                    <!-- Javascript will populate 30 buttons here -->
+                </div>
+            </div>
+
+            <!-- Auto-save notification -->
+            <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+                <span class="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Tersimpan Otomatis
+                </span>
+                <span class="text-slate-400 text-[10px]">Lokal Browser</span>
+            </div>
+        </aside>
+
+        <!-- Right Main Panel: Question Display Card (8 cols on lg) -->
+        <section class="lg:col-span-8 flex flex-col space-y-4">
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm relative min-h-[420px] flex flex-col justify-between">
+                
+                <div>
+                    <!-- Question Top Header -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <span id="current-q-badge" class="bg-smp-100 text-smp-700 font-extrabold text-xs px-3 py-1 rounded-xl border border-smp-200">
+                                Soal No. 1
+                            </span>
+                            <span id="topic-tag" class="bg-slate-100 text-slate-600 text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 font-medium">
+                                Sifat Perpangkatan
+                            </span>
+                        </div>
+                        <span id="q-status-badge" class="text-xs font-semibold text-slate-500 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200">
+                            Belum Dijawab
+                        </span>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div id="question-text" class="text-sm sm:text-base font-semibold text-slate-800 mb-6 leading-relaxed">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Options List -->
+                    <div id="options-container" class="space-y-3 mb-6">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Explanation Box (Appears when answered) -->
+                <div>
+                    <div id="explanation-box" class="hidden p-4 rounded-xl border text-xs sm:text-sm space-y-2 mb-4">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Pagination Navigation Controls -->
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-200 text-xs sm:text-sm">
+                        <button id="prev-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 font-semibold transition flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                        </button>
+                        
+                        <span id="page-indicator" class="text-slate-500 font-mono text-xs font-semibold">
+                            1 / 30
+                        </span>
+
+                        <button id="next-btn" class="bg-smp-600 hover:bg-smp-700 text-white px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 shadow-md shadow-smp-600/20 disabled:opacity-40">
+                            Berikutnya <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Summary Modal -->
+    <div id="summary-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative space-y-6">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-smp-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center mx-auto shadow-lg shadow-smp-500/30 mb-3">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Ringkasan Hasil Kuis</h2>
+                <p class="text-slate-500 text-xs sm:text-sm">Evaluasi pengerjaan 30 soal Operasi Pangkat & Akar</p>
+            </div>
+
+            <!-- Result Stats Grid -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 font-medium block mb-1">Total Skor</span>
+                    <span id="modal-score" class="text-xl sm:text-2xl font-extrabold text-emerald-600">0</span>
+                    <span class="text-[10px] text-slate-400 block">/ 100 Poin</span>
+                </div>
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 font-medium block mb-1">Benar</span>
+                    <span id="modal-correct" class="text-xl sm:text-2xl font-extrabold text-emerald-600">0</span>
+                    <span class="text-[10px] text-slate-400 block">Soal</span>
+                </div>
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 font-medium block mb-1">Salah</span>
+                    <span id="modal-wrong" class="text-xl sm:text-2xl font-extrabold text-rose-600">0</span>
+                    <span class="text-[10px] text-slate-400 block">Soal</span>
+                </div>
+            </div>
+
+            <!-- Accuracy Progress Bar -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-600">
+                    <span>Tingkat Akurasi</span>
+                    <span id="modal-accuracy" class="font-bold text-amber-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+                    <div id="modal-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full w-0 transition-all duration-500"></div>
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex gap-3 pt-2">
+                <button id="modal-review-btn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-3 rounded-xl border border-slate-200 transition">
+                    Tinjau Ulang Soal
+                </button>
+                <button id="modal-reset-btn" class="flex-1 bg-smp-600 hover:bg-smp-700 text-white text-xs font-bold py-3 rounded-xl transition shadow-md shadow-smp-600/20">
+                    Coba Lagi dari Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 text-slate-500 py-4 text-xs text-center mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            Modul Kuis Interaktif Matematika Kelas 7 SMP — Materi Eksponen & Bentuk Akar
+        </div>
+    </footer>
+
+    <script>
+        // 30 Distinct Exponent & Radical Questions for SMP Grade 7
+        const questionsData = [
+            {
+                id: 1,
+                topic: "Pengertian Pangkat",
+                question: "Nilai dari perpangkatan $3^4$ adalah ...",
+                options: { A: "12", B: "81", C: "64", D: "27" },
+                correct: "B",
+                explanation: "$3^4 = 3 \\times 3 \\times 3 \\times 3 = 81$."
+            },
+            {
+                id: 2,
+                topic: "Tanda Pangkat Negatif",
+                question: "Hasil perhitungan dari $(-2)^5$ adalah ...",
+                options: { A: "32", B: "-32", C: "-10", D: "10" },
+                correct: "B",
+                explanation: "Bilangan negatif dipangkatkan dengan bilangan **ganjil** hasilnya tetap **negatif**. Maka $(-2)^5 = -32$."
+            },
+            {
+                id: 3,
+                topic: "Tanda Pangkat Negatif",
+                question: "Hasil dari $-5^2$ (tanpa tanda kurung) adalah ...",
+                options: { A: "25", B: "-10", C: "10", D: "-25" },
+                correct: "D",
+                explanation: "Karena tidak menggunakan tanda kurung, tanda negatif tidak dipangkatkan: $-5^2 = -(5 \\times 5) = -25$."
+            },
+            {
+                id: 4,
+                topic: "Sifat Perkalian Pangkat",
+                question: "Bentuk sederhana dari $2^4 \\times 2^3$ dalam perpangkatan adalah ...",
+                options: { A: "$2^{12}$", B: "$4^7$", C: "$2^7$", D: "$2^1$" },
+                correct: "C",
+                explanation: "Sifat 1: $a^p \\times a^q = a^{p+q}$. Maka $2^4 \\times 2^3 = 2^{4+3} = 2^7$."
+            },
+            {
+                id: 5,
+                topic: "Sifat Perkalian Pangkat",
+                question: "Hasil dari $5^2 \\times 5^4$ adalah ...",
+                options: { A: "$5^6$", B: "$5^8$", C: "$25^6$", D: "$5^2$" },
+                correct: "A",
+                explanation: "$5^2 \\times 5^4 = 5^{2+4} = 5^6$."
+            },
+            {
+                id: 6,
+                topic: "Sifat Pembagian Pangkat",
+                question: "Bentuk sederhana dari $7^8 : 7^5$ adalah ...",
+                options: { A: "$7^{13}$", B: "$7^3$", C: "$1^3$", D: "$7^{40}$" },
+                correct: "B",
+                explanation: "Sifat 2: $a^p : a^q = a^{p-q}$. Maka $7^8 : 7^5 = 7^{8-5} = 7^3$."
+            },
+            {
+                id: 7,
+                topic: "Sifat Pembagian Pangkat",
+                question: "Nilai dari $10^6 : 10^2$ adalah ...",
+                options: { A: "$10^3$", B: "$10^8$", C: "$10^{12}$", D: "$10^4$" },
+                correct: "D",
+                explanation: "$10^6 : 10^2 = 10^{6-2} = 10^4 = 10.000$."
+            },
+            {
+                id: 8,
+                topic: "Pangkat Dipangkatkan",
+                question: "Bentuk sederhana dari $(3^2)^4$ adalah ...",
+                options: { A: "$3^6$", B: "$3^8$", C: "$9^8$", D: "$3^2$" },
+                correct: "B",
+                explanation: "Sifat 3: $(a^p)^q = a^{p \\times q}$. Maka $(3^2)^4 = 3^{2 \\times 4} = 3^8$."
+            },
+            {
+                id: 9,
+                topic: "Pangkat Dipangkatkan",
+                question: "Nilai sederhana dari $(2^5)^2$ adalah ...",
+                options: { A: "$2^{10}$", B: "$2^7$", C: "$2^3$", D: "$4^5$" },
+                correct: "A",
+                explanation: "$(2^5)^2 = 2^{5 \\times 2} = 2^{10}$."
+            },
+            {
+                id: 10,
+                topic: "Pangkat Nol",
+                question: "Hasil dari $(2026)^0 + (-15)^0$ adalah ...",
+                options: { A: "0", B: "1", C: "2011", D: "2" },
+                correct: "D",
+                explanation: "Setiap bilangan tak-nol dipangkatkan $0$ bernilai $1$. Maka $1 + 1 = 2$."
+            },
+            {
+                id: 11,
+                topic: "Pangkat Negatif",
+                question: "Bentuk pangkat positif dari $4^{-2}$ adalah ...",
+                options: { A: "-8", B: "-16", C: "$\\frac{1}{8}$", D: "$\\frac{1}{16}$" },
+                correct: "D",
+                explanation: "Sifat 6: $a^{-n} = \\frac{1}{a^n}$. Maka $4^{-2} = \\frac{1}{4^2} = \\frac{1}{16}$."
+            },
+            {
+                id: 12,
+                topic: "Pangkat Negatif",
+                question: "Nilai pecahan dari $3^{-3}$ adalah ...",
+                options: { A: "$\\frac{1}{27}$", B: "-27", C: "-9", D: "$\\frac{1}{9}$" },
+                correct: "A",
+                explanation: "$3^{-3} = \\frac{1}{3^3} = \\frac{1}{27}$."
+            },
+            {
+                id: 13,
+                topic: "Sifat Operasi Campuran",
+                question: "Bentuk sederhana dari $(2^3 \\times 2^2)^2$ adalah ...",
+                options: { A: "$2^7$", B: "$2^{12}$", C: "$2^{10}$", D: "$4^5$" },
+                correct: "C",
+                explanation: "Kerjakan dalam kurung terlebih dahulu: $(2^{3+2})^2 = (2^5)^2 = 2^{5 \\times 2} = 2^{10}$."
+            },
+            {
+                id: 14,
+                topic: "Operasi Variabel Pangkat",
+                question: "Bentuk sederhana dari $(a^3 \\times a^4) : a^2$ adalah ...",
+                options: { A: "$a^5$", B: "$a^6$", C: "$a^9$", D: "$a^2$" },
+                correct: "A",
+                explanation: "$(a^{3+4}) : a^2 = a^7 : a^2 = a^{7-2} = a^5$."
+            },
+            {
+                id: 15,
+                topic: "Menentukan Nilai x",
+                question: "Jika $x^3 = 64$, maka nilai $x$ bilangan bulat yang memenuhi adalah ...",
+                options: { A: "8", B: "6", C: "4", D: "3" },
+                correct: "C",
+                explanation: "Karena $4^3 = 4 \\times 4 \\times 4 = 64$, maka $x = 4$."
+            },
+            {
+                id: 16,
+                topic: "Menentukan Nilai x",
+                question: "Diketahui $x^4 = 81$. Jika $x$ adalah bilangan positif, maka nilai $x = \\dots$",
+                options: { A: "9", B: "3", C: "27", D: "4" },
+                correct: "B",
+                explanation: "Karena $3^4 = 81$, maka $x = 3$."
+            },
+            {
+                id: 17,
+                topic: "Menentukan Nilai x",
+                question: "Nilai $x$ positif yang memenuhi $(x-3)^2 = 49$ adalah ...",
+                options: { A: "7", B: "4", C: "10", D: "14" },
+                correct: "C",
+                explanation: "$(x-3)^2 = 7^2 \\implies x-3 = 7 \\implies x = 7+3 = 10$."
+            },
+            {
+                id: 18,
+                topic: "Menentukan Nilai N",
+                question: "Jika $8^2 = 2^N$, maka nilai $N$ adalah ...",
+                options: { A: "4", B: "5", C: "8", D: "6" },
+                correct: "D",
+                explanation: "Ubah basis 8 ke 2: $(2^3)^2 = 2^N \\implies 2^6 = 2^N \\implies N = 6$."
+            },
+            {
+                id: 19,
+                topic: "Menentukan Nilai N",
+                question: "Jika $27^2 = 3^N$, maka nilai $N$ adalah ...",
+                options: { A: "6", B: "5", C: "9", D: "8" },
+                correct: "A",
+                explanation: "Ubah basis 27 ke 3: $(3^3)^2 = 3^N \\implies 3^6 = 3^N \\implies N = 6$."
+            },
+            {
+                id: 20,
+                topic: "Menentukan Nilai N",
+                question: "Jika $4^3 \\times 2^4 = 2^N$, maka nilai $N$ adalah ...",
+                options: { A: "7", B: "12", C: "10", D: "8" },
+                correct: "C",
+                explanation: "Ubah ke basis 2: $(2^2)^3 \\times 2^4 = 2^6 \\times 2^4 = 2^{6+4} = 2^{10}$. Maka $N = 10$."
+            },
+            {
+                id: 21,
+                topic: "Bentuk Akar Rasional",
+                question: "Hasil penjumlahan akar $\\sqrt{144} + \\sqrt{25}$ adalah ...",
+                options: { A: "13", B: "17", C: "169", D: "19" },
+                correct: "B",
+                explanation: "$\\sqrt{144} = 12$ dan $\\sqrt{25} = 5$. Maka $12 + 5 = 17$."
+            },
+            {
+                id: 22,
+                topic: "Akar Pangkat Tiga",
+                question: "Nilai dari $\\sqrt[3]{27} + \\sqrt[3]{64}$ adalah ...",
+                options: { A: "7", B: "12", C: "9", D: "5" },
+                correct: "A",
+                explanation: "$\\sqrt[3]{27} = 3$ (karena $3^3=27$) dan $\\sqrt[3]{64} = 4$ (karena $4^3=64$). Maka $3 + 4 = 7$."
+            },
+            {
+                id: 23,
+                topic: "Menyederhanakan Akar",
+                question: "Bentuk sederhana dari akar irasional $\\sqrt{18}$ adalah ...",
+                options: { A: "$2\\sqrt{3}$", B: "$9\\sqrt{2}$", C: "$3\\sqrt{2}$", D: "$6\\sqrt{3}$" },
+                correct: "C",
+                explanation: "$\\sqrt{18} = \\sqrt{9 \\times 2} = \\sqrt{9} \\times \\sqrt{2} = 3\\sqrt{2}$."
+            },
+            {
+                id: 24,
+                topic: "Menyederhanakan Akar",
+                question: "Bentuk sederhana dari $\\sqrt{50}$ adalah ...",
+                options: { A: "$2\\sqrt{5}$", B: "$25\\sqrt{2}$", C: "$10\\sqrt{5}$", D: "$5\\sqrt{2}$" },
+                correct: "D",
+                explanation: "$\\sqrt{50} = \\sqrt{25 \\times 2} = \\sqrt{25} \\times \\sqrt{2} = 5\\sqrt{2}$."
+            },
+            {
+                id: 25,
+                topic: "Menyederhanakan Akar",
+                question: "Bentuk sederhana dari $\\sqrt{75}$ adalah ...",
+                options: { A: "$5\\sqrt{3}$", B: "$3\\sqrt{5}$", C: "$15\\sqrt{5}$", D: "$25\\sqrt{3}$" },
+                correct: "A",
+                explanation: "$\\sqrt{75} = \\sqrt{25 \\times 3} = \\sqrt{25} \\times \\sqrt{3} = 5\\sqrt{3}$."
+            },
+            {
+                id: 26,
+                topic: "Bentuk Irasional",
+                question: "Di antara bilangan-bilangan berikut yang merupakan **bentuk akar (bilangan irasional)** adalah ...",
+                options: { A: "$\\sqrt{36}$", B: "$\\sqrt{49}$", C: "$\\sqrt{20}$", D: "$\\sqrt{81}$" },
+                correct: "C",
+                explanation: "$\\sqrt{36}=6$, $\\sqrt{49}=7$, dan $\\sqrt{81}=9$ adalah bilangan rasional (bulat). Sedangkan $\\sqrt{20} = 2\\sqrt{5}$ adalah bentuk irasional."
+            },
+            {
+                id: 27,
+                topic: "Penjumlahan Bentuk Akar",
+                question: "Hasil sederhana dari $2\\sqrt{3} + 5\\sqrt{3} - 3\\sqrt{3}$ adalah ...",
+                options: { A: "$10\\sqrt{3}$", B: "$4\\sqrt{3}$", C: "$4\\sqrt{9}$", D: "$7\\sqrt{3}$" },
+                correct: "B",
+                explanation: "Karena bilangan dalam akar sama ($\\sqrt{3}$), jumlahkan koefisiennya: $(2 + 5 - 3)\\sqrt{3} = 4\\sqrt{3}$."
+            },
+            {
+                id: 28,
+                topic: "Aplikasi Eksponen",
+                question: "Sebuah persegi memiliki panjang sisi $2^4$ cm. Luas persegi tersebut adalah ... $\\text{cm}^2$",
+                options: { A: "16", B: "64", C: "128", D: "256" },
+                correct: "D",
+                explanation: "Panjang sisi $s = 2^4 = 16$ cm. $\\text{Luas} = s^2 = (2^4)^2 = 2^8 = 256\\text{ cm}^2$."
+            },
+            {
+                id: 29,
+                topic: "Operasi Campuran",
+                question: "Hasil dari $5^3 : 5^1 + 2^4$ adalah ...",
+                options: { A: "41", B: "39", C: "29", D: "45" },
+                correct: "A",
+                explanation: "$5^{3-1} + 2^4 = 5^2 + 16 = 25 + 16 = 41$."
+            },
+            {
+                id: 30,
+                topic: "Soal HOTS Eksponen",
+                question: "Nilai sederhana dari $\\frac{2^8 \\times 3^4}{2^5 \\times 3^2}$ adalah ...",
+                options: { A: "36", B: "72", C: "108", D: "48" },
+                correct: "B",
+                explanation: "Bagi basis sejenis: $2^{8-5} \\times 3^{4-2} = 2^3 \\times 3^2 = 8 \\times 9 = 72$."
+            }
+        ];
+
+        const STORAGE_KEY = "quiz_eksponen_smp7_user_answers_v1";
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+
+        // Load saved progress from LocalStorage
+        function loadSavedState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    userAnswers = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn("Could not load saved quiz state from LocalStorage", e);
+            }
+        }
+
+        // Save progress to LocalStorage
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userAnswers));
+            } catch (e) {
+                console.warn("Could not save quiz state to LocalStorage", e);
+            }
+        }
+
+        // Helper to trigger KaTeX math rendering
+        function renderMathIn(element) {
+            if (typeof renderMathInElement === "function" && element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // Calculate score & stats
+        function calculateStats() {
+            let answered = 0;
+            let correct = 0;
+            let wrong = 0;
+
+            questionsData.forEach(q => {
+                const ans = userAnswers[q.id];
+                if (ans) {
+                    answered++;
+                    if (ans === q.correct) {
+                        correct++;
+                    } else {
+                        wrong++;
+                    }
+                }
+            });
+
+            const score = Math.round((correct / questionsData.length) * 100);
+
+            return { answered, correct, wrong, score };
+        }
+
+        // Update Sidebar Stats & Question Palette
+        function updateSidebar() {
+            const stats = calculateStats();
+            document.getElementById("answered-count-label").textContent = `${stats.answered} / ${questionsData.length} Terjawab`;
+            document.getElementById("score-label").textContent = `${stats.score} Poin`;
+
+            const palette = document.getElementById("question-palette");
+            palette.innerHTML = "";
+
+            questionsData.forEach((q, idx) => {
+                const btn = document.createElement("button");
+                btn.textContent = idx + 1;
+                
+                const userAns = userAnswers[q.id];
+                const isActive = idx === currentQuestionIndex;
+
+                let classes = "w-full h-9 rounded-xl font-bold text-xs transition flex items-center justify-center border shadow-sm ";
+
+                if (isActive) {
+                    classes += "border-2 border-smp-600 ring-2 ring-smp-500/30 ";
+                } else {
+                    classes += "border-slate-200 ";
+                }
+
+                if (userAns) {
+                    if (userAns === q.correct) {
+                        classes += "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200";
+                    } else {
+                        classes += "bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200";
+                    }
+                } else {
+                    classes += isActive 
+                        ? "bg-smp-600 text-white" 
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200";
+                }
+
+                btn.className = classes;
+                btn.addEventListener("click", () => {
+                    currentQuestionIndex = idx;
+                    renderQuestion();
+                });
+
+                palette.appendChild(btn);
+            });
+        }
+
+        // Render current question card details
+        function renderQuestion() {
+            const q = questionsData[currentQuestionIndex];
+            const userAns = userAnswers[q.id];
+
+            // Badges & Labels
+            document.getElementById("current-q-badge").textContent = `Soal No. ${q.id}`;
+            document.getElementById("topic-tag").textContent = q.topic;
+            document.getElementById("page-indicator").textContent = `${currentQuestionIndex + 1} / ${questionsData.length}`;
+
+            const qStatusBadge = document.getElementById("q-status-badge");
+            if (userAns) {
+                if (userAns === q.correct) {
+                    qStatusBadge.textContent = "Benar ✓";
+                    qStatusBadge.className = "text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200";
+                } else {
+                    qStatusBadge.textContent = "Salah ✗";
+                    qStatusBadge.className = "text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-200";
+                }
+            } else {
+                qStatusBadge.textContent = "Belum Dijawab";
+                qStatusBadge.className = "text-xs font-semibold text-slate-500 px-3 py-1 rounded-full bg-slate-100 border border-slate-200";
+            }
+
+            // Question Text
+            const qTextEl = document.getElementById("question-text");
+            qTextEl.innerHTML = q.question;
+            renderMathIn(qTextEl);
+
+            // Options List
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+
+            Object.keys(q.options).forEach(optKey => {
+                const optVal = q.options[optKey];
+                const optBtn = document.createElement("button");
+
+                let btnStyle = "w-full text-left p-3.5 sm:p-4 rounded-xl border text-xs sm:text-sm font-medium transition flex items-center justify-between ";
+
+                if (userAns) {
+                    optBtn.disabled = true;
+                    btnStyle += "cursor-default ";
+
+                    if (optKey === q.correct) {
+                        btnStyle += "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm";
+                    } else if (optKey === userAns) {
+                        btnStyle += "bg-rose-50 border-rose-500 text-rose-900 shadow-sm";
+                    } else {
+                        btnStyle += "bg-slate-50/50 border-slate-200 text-slate-400 opacity-60";
+                    }
+                } else {
+                    btnStyle += "bg-slate-50 hover:bg-smp-50/80 border-slate-200 hover:border-smp-400 text-slate-800";
+                }
+
+                optBtn.className = btnStyle;
+
+                // Option Label (A, B, C, D) + Content
+                optBtn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg bg-white text-slate-700 font-bold flex items-center justify-center text-xs border border-slate-200 shrink-0 shadow-xs">
+                            ${optKey}
+                        </span>
+                        <span class="opt-text">${optVal}</span>
+                    </div>
+                    ${userAns && optKey === q.correct ? '<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>' : ''}
+                    ${userAns && optKey === userAns && userAns !== q.correct ? '<i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i>' : ''}
+                `;
+
+                // Add click listener
+                if (!userAns) {
+                    optBtn.addEventListener("click", () => handleSelectAnswer(q.id, optKey));
+                }
+
+                optionsContainer.appendChild(optBtn);
+                renderMathIn(optBtn);
+            });
+
+            // Explanation Box
+            const expBox = document.getElementById("explanation-box");
+            if (userAns) {
+                expBox.classList.remove("hidden");
+                const isCorrect = userAns === q.correct;
+
+                if (isCorrect) {
+                    expBox.className = "p-4 rounded-xl border text-xs sm:text-sm space-y-2 mb-4 bg-emerald-50 border-emerald-200 text-emerald-900";
+                    expBox.innerHTML = `
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Jawaban Kamu Benar!
+                        </div>
+                        <div><strong>Pembahasan:</strong> ${q.explanation}</div>
+                    `;
+                } else {
+                    expBox.className = "p-4 rounded-xl border text-xs sm:text-sm space-y-2 mb-4 bg-rose-50 border-rose-200 text-rose-900";
+                    expBox.innerHTML = `
+                        <div class="font-bold text-rose-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-xmark"></i> Jawaban Kurang Tepat. (Kunci: ${q.correct})
+                        </div>
+                        <div><strong>Pembahasan:</strong> ${q.explanation}</div>
+                    `;
+                }
+                renderMathIn(expBox);
+            } else {
+                expBox.classList.add("hidden");
+            }
+
+            // Prev & Next Buttons state
+            document.getElementById("prev-btn").disabled = currentQuestionIndex === 0;
+            document.getElementById("next-btn").disabled = currentQuestionIndex === questionsData.length - 1;
+
+            updateSidebar();
+        }
+
+        // Handle option selection
+        function handleSelectAnswer(questionId, selectedOption) {
+            userAnswers[questionId] = selectedOption;
+            saveState();
+            renderQuestion();
+        }
+
+        // Initialize App & Event Listeners
+        document.addEventListener("DOMContentLoaded", function () {
+            loadSavedState();
+            renderQuestion();
+
+            // Next & Prev Buttons
+            document.getElementById("prev-btn").addEventListener("click", () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+
+            document.getElementById("next-btn").addEventListener("click", () => {
+                if (currentQuestionIndex < questionsData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+
+            // Reset storage button
+            document.getElementById("reset-storage-btn").addEventListener("click", () => {
+                if (confirm("Apakah kamu yakin ingin menghapus semua jawaban yang tersimpan dan mengulang kuis?")) {
+                    userAnswers = {};
+                    saveState();
+                    currentQuestionIndex = 0;
+                    renderQuestion();
+                }
+            });
+
+            // Modal Summary Logic
+            const modal = document.getElementById("summary-modal");
+            const showSummaryBtn = document.getElementById("show-summary-btn");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+            const modalReviewBtn = document.getElementById("modal-review-btn");
+            const modalResetBtn = document.getElementById("modal-reset-btn");
+
+            function openModal() {
+                const stats = calculateStats();
+                document.getElementById("modal-score").textContent = stats.score;
+                document.getElementById("modal-correct").textContent = stats.correct;
+                document.getElementById("modal-wrong").textContent = stats.wrong;
+
+                const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+                document.getElementById("modal-accuracy").textContent = `${accuracy}%`;
+                document.getElementById("modal-progress-bar").style.width = `${accuracy}%`;
+
+                modal.classList.remove("hidden");
+            }
+
+            showSummaryBtn.addEventListener("click", openModal);
+            closeModalBtn.addEventListener("click", () => modal.classList.add("hidden"));
+            modalReviewBtn.addEventListener("click", () => modal.classList.add("hidden"));
+
+            modalResetBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+                userAnswers = {};
+                saveState();
+                currentQuestionIndex = 0;
+                renderQuestion();
+            });
+
+            // Keyboard Arrow Key Navigation
+            document.addEventListener("keydown", (e) => {
+                if (modal.classList.contains("hidden")) {
+                    if (e.key === "ArrowLeft" && currentQuestionIndex > 0) {
+                        currentQuestionIndex--;
+                        renderQuestion();
+                    } else if (e.key === "ArrowRight" && currentQuestionIndex < questionsData.length - 1) {
+                        currentQuestionIndex++;
+                        renderQuestion();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
